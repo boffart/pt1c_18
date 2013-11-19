@@ -1,0 +1,87 @@
+<?php
+function pt1s_check_configs_file($is_new=true){
+    global $amp_conf;
+    global $amp_conf;
+	/*
+	[general](+)
+	webenabled=yes
+	allowmultiplelogin = yes
+	httptimeout = 60
+	*/
+	$file_manager_custom = $amp_conf['ASTETCDIR'].'/manager_custom.conf';
+	if(!is_file($file_manager_custom)){
+		copy(dirname(__FILE__)."/etc/manager_custom.conf", $file_manager_custom);
+		chmod($file_manager_custom, 0664);
+	}
+	if(is_file($file_manager_custom)){
+		$ini = new pt1c_ini_parser();
+		$ini->read($file_manager_custom);
+	
+		$ini->set('general', 'webenabled',         'yes', '', '=','+');
+		$ini->set('general', 'allowmultiplelogin', 'yes', '', '=','+');
+		$ini->set('general', 'httptimeout',        '60' , '', '=','+');
+		
+		$ini->write($file_manager_custom);
+	}
+	
+	/*
+	;etc/cdr_adaptive_odbc.conf
+	[PT1C_Global]
+	connection=PT1C_asteriskcdrdb
+	table=PT1C_cdr	
+	alias recordingfile => recordingfile
+	alias start => calldate
+	*/
+	$file_adaptive_odbc = $amp_conf['ASTETCDIR'].'/cdr_adaptive_odbc.conf';
+	if(!is_file($file_adaptive_odbc)){
+		copy(dirname(__FILE__)."/etc/cdr_adaptive_odbc.conf", $file_adaptive_odbc);
+		chmod($file_adaptive_odbc, 0664);
+	}
+	if(is_file($file_adaptive_odbc)){
+		$ini = new pt1c_ini_parser();
+		$ini->read($file_adaptive_odbc);
+	
+		$ini->set('PT1C_Global', 'connection'			, 'PT1C_asteriskcdrdb'	, '', '=' ,'');
+		$ini->set('PT1C_Global', 'table'				, 'PT1C_cdr'			, '', '=' ,'');
+		$ini->set('PT1C_Global', 'alias recordingfile'  , 'recordingfile' 		, '', '=>','');
+		$ini->set('PT1C_Global', 'alias start'			, 'calldate'	 		, '', '=>','');
+		
+		$ini->write($file_adaptive_odbc);
+	}
+	
+	/*
+	[general]
+	enabled=no
+	enablestatic=no
+	bindaddr=0.0.0.0
+	bindport=8088
+	prefix=asterisk
+	
+	tlsenable=no
+	tlsbindaddr=127.0.0.1:4443 
+	tlscertfile= /etc/asterisk/PT1C_ajam.pem
+	tlsprivatekey= /etc/asterisk/PT1C_ajam.pem
+	*/
+	$file_http = $amp_conf['ASTETCDIR'].'/http.conf';
+	if(!is_file($file_http)){
+		copy(dirname(__FILE__)."/etc/http.conf", $file_http);
+		chmod($file_http, 0664);
+		$is_new=true;
+	}
+	if($is_new==true && is_file($file_http)){
+		$ini = new pt1c_ini_parser();
+		$ini->read($file_http);
+	
+		$ini->set('general', 'enabled'		, 'no'		, '', '=', '');
+		$ini->set('general', 'enablestatic'	, 'no'		, '', '=', '');
+		$ini->set('general', 'bindaddr'  	, '0.0.0.0' , '', '=', '');
+		$ini->set('general', 'bindport'		, '8088'	, '', '=', '');
+		$ini->set('general', 'prefix'		, 'asterisk', '', '=', '');
+		
+		$ini->set('general', 'tlsenable'	, 'no' 										, '', '=', '');
+		$ini->set('general', 'tlsbindaddr'	, '127.0.0.1:4443' 							, '', '=', '');
+		$ini->set('general', 'tlscertfile'	,  $amp_conf['ASTETCDIR'].'/PT1C_ajam.pem'	, '', '=', '');
+		$ini->set('general', 'tlsprivatekey',  $amp_conf['ASTETCDIR'].'/PT1C_ajam.pem'	, '', '=', '');
+		$ini->write($file_http);
+	}
+}?>

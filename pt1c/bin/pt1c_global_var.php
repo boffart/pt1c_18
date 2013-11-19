@@ -1,0 +1,10 @@
+<?php
+$pt1c_agi_files[]='1C_CDR.php';
+$pt1c_agi_files[]='1C_Download.php';
+$pt1c_agi_files[]='1C_Functions.php';
+$pt1c_agi_files[]='1C_get_context.php';
+$pt1c_agi_files[]='1C_HistoryFax.php';
+$pt1c_agi_files[]='1C_Playback.php';
+$pt1c_agi_files[]='1C_SetStatus.php';
+$pt1c_agi_files[]='1C_SetupEnv.php';
+?>

@@ -1,0 +1,29 @@
+<module>
+	<rawname>pt1c</rawname>
+	<repo>standard</repo>
+	<name>Asterisk AJAM Settings (PT1C)</name>
+	<version>2.11.1.2</version>
+	<type>tool</type>
+	<category>Settings</category>
+	<publisher>telefon1c.ru</publisher>	
+	<description>
+		Этот модуль предназначен для работы с продуктом "Панель телефонии 1С" компании ООО "МИКО".
+	</description>
+	<changelog>
+		*2.11.1.2* Доработки для совместимости с FreePBX Distro
+		*2.11.1.0* Переход на использование MySQL (Через ODBC).
+		*2.10.1.7*		
+		*2.10.0.17*		
+		*2.10.0.15*
+		*2.10.0.14*
+		*2.10.0.13* 	        
+ 		*2.10.0.12*
+ 		*2.10.0.9* Переход на использование AGI скриптов.
+        *2.10.0.0* Первая версия плагина.
+	</changelog>
+	<license>AGPLv3</license>
+	<location>release/2.11/pt1c-2.11.1.2.tgz</location>
+	<menuitems>
+		<pt1c sort="1">Asterisk AJAM Settings (PT1C)</pt1c>
+	</menuitems>
+</module>
