@@ -48,6 +48,27 @@ function pt1s_check_configs_file($is_new=true){
 		
 		$ini->write($file_adaptive_odbc);
 	}
+	/*
+	[general]
+	enable=yes
+	apps=all
+	events=ALL
+	*/
+	$file_cel = $amp_conf['ASTETCDIR'].'/cel.conf';
+	if(!is_file($file_cel)){
+		copy(dirname(__FILE__)."/etc/cel.conf", $$file_cel);
+		chmod($file_cel, 0664);
+	}
+	if(is_file($file_cel)){
+		$ini = new pt1c_ini_parser();
+		$ini->read($file_cel);
+	
+		$ini->set('general', 'enable'	, 'yes'	, '', '=' ,'');
+		$ini->set('general', 'apps'		, 'ALL'	, '', '=' ,'');
+		$ini->set('general', 'events'  	, 'ALL' , '', '=' ,'');
+		
+		$ini->write($file_cel);
+	}
 	
 	/*
 	[general]
