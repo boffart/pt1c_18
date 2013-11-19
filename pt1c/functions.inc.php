@@ -22,18 +22,59 @@ function pt1c_get_config($engine){
 	global $core_conf, $cdr_conf, $amp_conf;
 	switch($engine) {
     	case "asterisk":
-/*
+
 	    	if (isset($core_conf) && is_a($core_conf, "core_conf")) {
-				$section = 'PT1C_asteriskcdrdb';
-				$core_conf->addResOdbc($section, array('enabled' => 'yes'));
-				$core_conf->addResOdbc($section, array('dsn' => 'MySQL-asteriskcdrdb'));
-				$core_conf->addResOdbc($section, array('pooling' => 'no'));
-				$core_conf->addResOdbc($section, array('limit' => '1'));
-				$core_conf->addResOdbc($section, array('pre-connect' => 'yes'));
-				$core_conf->addResOdbc($section, array('username' => $amp_conf['AMPDBUSER']));
-				$core_conf->addResOdbc($section, array('password' => $amp_conf['AMPDBPASS']));
-			}
-*/
+				if(method_exists($core_conf, "addResOdbc")){
+					$section = 'PT1C_asteriskcdrdb';
+					$core_conf->addResOdbc($section, array('enabled' => 'yes'));
+					$core_conf->addResOdbc($section, array('dsn' => 'MySQL-asteriskcdrdb'));
+					$core_conf->addResOdbc($section, array('pooling' => 'no'));
+					$core_conf->addResOdbc($section, array('limit' => '1'));
+					$core_conf->addResOdbc($section, array('pre-connect' => 'yes'));
+					$core_conf->addResOdbc($section, array('username' => $amp_conf['AMPDBUSER']));
+					$core_conf->addResOdbc($section, array('password' => $amp_conf['AMPDBPASS']));
+				}else{
+					$file_res_odbc = $amp_conf['ASTETCDIR'].'/res_odbc.conf';
+					if(!is_file($file_res_odbc)){
+						copy(dirname(__FILE__)."/etc/res_odbc.conf", $file_res_odbc);
+						chmod($file_res_odbc, 0664);
+					}
+					if(is_file($file_res_odbc)){
+						$section = 'PT1C_asteriskcdrdb';
+						$ini = new pt1c_ini_parser();
+						$ini->read($file_res_odbc);
+					
+						$ini->set($section, 'enabled', 		'yes', 					'', '=' ,'');
+						$ini->set($section, 'dsn', 			'MySQL-asteriskcdrdb', 	'', '=' ,'');
+						$ini->set($section, 'pooling', 		'no', 					'', '=' ,'');
+						$ini->set($section, 'limit', 		'2', 					'', '=' ,'');
+						$ini->set($section, 'pre-connect', 	'yes', 					'', '=' ,'');
+						$ini->set($section, 'username', 	$amp_conf['AMPDBUSER'], '', '=' ,'');
+						$ini->set($section, 'password', 	$amp_conf['AMPDBPASS'], '', '=' ,'');
+						
+						$ini->write($file_res_odbc);
+					}
+					
+					$file_cel_odbc = $amp_conf['ASTETCDIR'].'/cel_odbc.conf';
+					if(!is_file($file_cel_odbc)){
+						copy(dirname(__FILE__)."/etc/cel_odbc.conf", $file_cel_odbc);
+						chmod($file_cel_odbc, 0664);
+					}
+					if(is_file($file_cel_odbc)){
+						$section = 'PT1C_cel';
+						$ini = new pt1c_ini_parser();
+						$ini->read($file_cel_odbc);
+					
+						$ini->set($section, 'connection', 	'PT1C_asteriskcdrdb', 	'', '=' ,'');
+						$ini->set($section, 'loguniqueid', 	'yes', 					'', '=' ,'');
+						$ini->set($section, 'table', 		'cel', 					'', '=' ,'');
+						
+						$ini->write($file_cel_odbc);
+					}
+					
+				}
+			} // odbc settings
+
 	    	if (isset($ext) && is_a($ext, "extensions")) {
 			  	$section  ='miko_ajam';
 				/*
