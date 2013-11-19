@@ -24,6 +24,7 @@ $uniqueid1c = GetVarChannnel($agi, "uniqueid1c");
 $www_1c_dir = GetConfDir("www","1c/");
 $sub_dir    = ""; // вложенная директория для поиска файла записи / факса
 $_idle_name = "";
+$filename   = "";
   
 if(strlen($uniqueid1c) >= 4){
 	$db_name = GetVarChannnel($agi,'CDRDBNAME');
@@ -31,24 +32,37 @@ if(strlen($uniqueid1c) >= 4){
 	
 	/*------------------------------------------*/
 	$AGIDB = new AGIDB($agi, $db_name);
+	// check for 2.8-style tables - START
+	$recordingfile_exists = false;
+	$sql_fields="describe `$db_name`.`cdr`";
+	$fields = $AGIDB->sql($sql_fields, 'ASSOC');
+	foreach($fields as $_data){
+		if($_data['Field']=='recordingfile'){
+			$recordingfile_exists=true;
+		}
+	}
+	$file_field = ($recordingfile_exists==true)?'recordingfile':'userfield';
 	/*------------------------------------------*/
 	// 1.Формируем запрос
-	$zapros = "SELECT `calldate`, `uniqueid`, `recordingfile` FROM `$db_name`.`PT1C_cdr` WHERE uniqueid LIKE '$uniqueid1c%' LIMIT 1";     
+	// check for 2.8-style tables - END
+	
+	$zapros = "SELECT DATE_FORMAT(`calldate`,'%Y/%m/%d%/'), `uniqueid`, `$file_field` FROM `$db_name`.`PT1C_cdr` WHERE `uniqueid` LIKE '$uniqueid1c%' LIMIT 1";     
 	$results= $AGIDB->sql($zapros, 'NUM');
 	
 	if(count($results)>=1 && count($results[0])==3){
-		$ar_str=$results[0];
-		$calldate = date_create($ar_str[0]);
-		if($calldate!=false){
-			$sub_dir = date_format($calldate, 'Y/m/d');
-			$_idle_name = $sub_dir."/";  
-		}
-		$_idle_name .= $ar_str[2];  
+		// $agi->verbose($ar_str[2], '3');
+		$filename = $results[0][2];
+		$filename = ($recordingfile_exists==false)?str_replace("audio:", '', $filename): $filename;
+		$_idle_name .= $results[0][0].$filename; 
 	}	  
+
 }
 
 $searchDir = GetVarChannnel($agi, "ASTSPOOLDIR").'/monitor/';
-$recordingfile = $searchDir.$_idle_name;
+$recordingfile = (is_file($searchDir.$_idle_name))?($searchDir.$_idle_name):($searchDir.$filename);
+
+$agi->verbose($recordingfile, '3');
+
 if(is_file($recordingfile)) {
     $response = "CallRecord,Channel:$chan,FileName:$recordingfile";
 }else{

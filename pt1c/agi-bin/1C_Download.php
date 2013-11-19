@@ -26,7 +26,7 @@ $RecFax     = GetVarChannnel($agi,'v6');
 $www_1c_dir = GetConfDir("www","1c/");
 $sub_dir    = ""; // вложенная директория для поиска файла записи / факса
 $_idle_name = "";
-
+$filename   = "";
 
 if(strlen($uniqueid1c) >= 4){
 	$db_name = GetVarChannnel($agi,'CDRDBNAME');
@@ -34,30 +34,38 @@ if(strlen($uniqueid1c) >= 4){
 	
 	/*------------------------------------------*/
 	$AGIDB = new AGIDB($agi, $db_name);
+	// check for 2.8-style tables - START
+	$recordingfile_exists = false;
+	$sql_fields="describe `$db_name`.`cdr`";
+	$fields = $AGIDB->sql($sql_fields, 'ASSOC');
+	foreach($fields as $_data){
+		if($_data['Field']=='recordingfile'){
+			$recordingfile_exists=true;
+		}
+	}
+	$file_field = ($recordingfile_exists==true)?'recordingfile':'userfield';
 	/*------------------------------------------*/
 	// 1.Формируем запрос
-	$zapros = "SELECT `calldate`, `uniqueid`, `recordingfile` FROM `$db_name`.`PT1C_cdr` WHERE uniqueid LIKE '$uniqueid1c%' LIMIT 1";     
+	$zapros = "SELECT DATE_FORMAT(`calldate`,'%Y/%m/%d%/'), `uniqueid`, `$file_field` FROM `$db_name`.`PT1C_cdr` WHERE `uniqueid` LIKE '$uniqueid1c%' LIMIT 1";     
 	$results= $AGIDB->sql($zapros, 'NUM');
 	
 	if(count($results)>=1 && count($results[0])==3){
 		$ar_str=$results[0];
 		if($RecFax == "Records"){
-			$sub_dir = $ar_str[0];
+			$sub_dir  = $ar_str[0];
+			$filename = $ar_str[2];
 			
-			$calldate = date_create($ar_str[0]);
-			if($calldate!=false){
-				$sub_dir = date_format($calldate, 'Y/m/d');
-				$_idle_name = $sub_dir."/";  
-			}			
+			$filename 	 = ($recordingfile_exists==false)?str_replace("audio:", '', $filename): $filename;
+		  	$searchDir = GetVarChannnel($agi, "ASTSPOOLDIR").'/monitor/';
+			if(!is_file($searchDir.$filename)){
+				$searchDir .= $sub_dir; 
+			}
+	  		$_idle_name .= basename($filename);  
+		}else{
+	  		$searchDir = GetVarChannnel($agi, "ASTSPOOLDIR").'/fax/';
+	  		$_idle_name .= basename($ar_str[2]);  
 		}
-		$_idle_name .= basename($ar_str[2]);  
 	}	  
-}
-
-if($RecFax == "FAX"){
-  	$searchDir = GetVarChannnel($agi, "ASTSPOOLDIR").'/fax/';
-}elseif($RecFax == "Records"){
-  	$searchDir = GetVarChannnel($agi, "ASTSPOOLDIR").'/monitor/';
 }
 
 $search_file = $searchDir.$_idle_name;

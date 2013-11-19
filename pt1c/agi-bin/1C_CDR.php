@@ -30,7 +30,18 @@ $db_name = !empty($amp_conf['CDRDBNAME'])?$amp_conf['CDRDBNAME']:"asteriskcdrdb"
 $AGIDB = new AGIDB($agi, $db_name);
 /*------------------------------------------*/
 
-$output 	= array();
+// check for 2.8-style tables - START
+$sql_fields="describe $db_name.cdr";
+$fields = $AGIDB->sql($sql_fields, 'ASSOC');
+$recordingfile_exists = false;
+foreach($fields as $_data){
+	if($_data['Field']=='recordingfile'){
+		$recordingfile_exists=true;
+	}
+}
+$file_field = ($recordingfile_exists==true)?'recordingfile':'userfield';
+// check for 2.8-style tables - END
+
 // //////////////////// //////////////////// //////////////////// //////////////////// //////////////////
 // MySQL
 $zapros=
@@ -43,7 +54,7 @@ $zapros=
 	`a`.`billsec`,
 	`a`.`disposition`,
 	`a`.`uniqueid`,
-	`a`.`recordingfile`,
+	`a`.`$file_field`,
 	`a`.`peer`,
 	`a`.`lastapp`,
 	`a`.`linkedid`
@@ -89,7 +100,6 @@ for($i=0; $i < $rowCount; $i++) {
 			        )";  
 }	
 $output= $AGIDB->sql($zapros, 'NUM');
-$agi->verbose('---------'.$results[0][7],'3');
 
 // ------------------------------------------------------------------
 // 2. Обрабатываем временный файл и отправляем данные в 1С
@@ -100,10 +110,10 @@ $result = ""; $ch = 1;
 foreach($output as $_data){
     // набор символов - разделитель строк
     if(! $result=="") $result = $result.".....";
-
 	
 	foreach($_data as $field){
-		$result=$result.trim(str_replace(" ", '\ ', $field)).'@.@';
+		$_field = ($recordingfile_exists==false)?str_replace("audio:", '', $field): $field;
+		$result=$result.trim(str_replace(" ", '\ ', $_field)).'@.@';
 	}
 
     // если необходимо отправляем данные порциями
