@@ -24,10 +24,7 @@ $ASTSPOOLDIR = GetConfDir('astspooldir');
 $tmpdir = $ASTSPOOLDIR.'fax/';
 $faxdir = $ASTSPOOLDIR."fax/";
 
-if(!is_dir($faxdir)){
-	echo '<b>404 Dir. "fax" not found!</b>';
-	return;
-}
+if(!is_dir($faxdir)) mkdir($faxdir);
  
 if (is_uploaded_file($_FILES['file']['tmp_name'])) {
 	$filename = str_replace(" ","_",$_FILES['file']['name']);
