@@ -21,6 +21,9 @@ function pt1s_check_configs_file($is_new=true){
 		$ini->set('general', 'allowmultiplelogin', 'yes', '', '=','+');
 		$ini->set('general', 'httptimeout',        '60' , '', '=','+');
 		
+		$ini->set('mappings', 'recordingfile', 'recordingfile', '', '=>','');
+		$ini->set('mappings', 'linkedid',      'linkedid'     , '', '=>','');
+		
 		$ini->write($file_manager_custom);
 	}
 	
