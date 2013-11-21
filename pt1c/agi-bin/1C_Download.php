@@ -43,7 +43,7 @@ if(strlen($uniqueid1c) >= 4){
 			$recordingfile_exists=true;
 		}
 	}
-	$file_field = ($recordingfile_exists==true)?'recordingfile':'userfield';
+	$file_field = ($recordingfile_exists==true || $RecFax!="Records")?'recordingfile':'userfield';
 	/*------------------------------------------*/
 	// 1.Формируем запрос
 	$zapros = "SELECT DATE_FORMAT(`calldate`,'%Y/%m/%d%/'), `uniqueid`, `$file_field` FROM `$db_name`.`PT1C_cdr` WHERE `uniqueid` LIKE '$uniqueid1c%' LIMIT 1";     

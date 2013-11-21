@@ -31,7 +31,7 @@ $agi->exec("UserEvent",   "AsteriskSettings"
     					.",DefaultContext:$DefaultContext"
     					.",SkypeContext:$SkypeContext"
     					.",DialplanVer:$DialplanVer"
-                        .",autoanswernumber:***80"
+                        .",autoanswernumber:**"
                         .",Statistic:$Statistic"
 						.",GhostScriptVer:$GSVER");
 //
