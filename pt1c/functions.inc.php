@@ -24,15 +24,21 @@ function pt1c_get_config($engine){
     	case "asterisk":
 
 	    	if (isset($core_conf) && is_a($core_conf, "core_conf")) {
-				if(method_exists($core_conf, "addResOdbc")){
+				$ini = new pt1c_ini_parser();
+				$ini->read('/etc/odbc.ini');
+				$name_connection = ($ini->sections_exist('MySQL-asteriskcdrdb'))?'MySQL-asteriskcdrdb':'pt1c-MySQL-asteriskcdrdb';
+
+				$ver_core = pt1c_modules_getversion('core');
+				if(version_compare($ver_core, '2.8.1.2', '>') && method_exists($core_conf, "addResOdbc")){
 					$section = 'PT1C_asteriskcdrdb';
 					$core_conf->addResOdbc($section, array('enabled' => 'yes'));
-					$core_conf->addResOdbc($section, array('dsn' => 'MySQL-asteriskcdrdb'));
+					$core_conf->addResOdbc($section, array('dsn' => $name_connection));
 					$core_conf->addResOdbc($section, array('pooling' => 'no'));
 					$core_conf->addResOdbc($section, array('limit' => '1'));
 					$core_conf->addResOdbc($section, array('pre-connect' => 'yes'));
 					$core_conf->addResOdbc($section, array('username' => $amp_conf['AMPDBUSER']));
 					$core_conf->addResOdbc($section, array('password' => $amp_conf['AMPDBPASS']));
+					
 				}else{
 					$file_res_odbc = $amp_conf['ASTETCDIR'].'/res_odbc.conf';
 					if(!is_file($file_res_odbc)){
@@ -40,12 +46,12 @@ function pt1c_get_config($engine){
 						chmod($file_res_odbc, 0664);
 					}
 					if(is_file($file_res_odbc)){
+						
 						$section = 'PT1C_asteriskcdrdb';
 						$ini = new pt1c_ini_parser();
 						$ini->read($file_res_odbc);
-					
-						$ini->set($section, 'enabled', 		'yes', 					'', '=' ,'');
-						$ini->set($section, 'dsn', 			'MySQL-asteriskcdrdb', 	'', '=' ,'');
+						$ini->set($section, 'enabled', 		'yes', 						'', '=' ,'');
+						$ini->set($section, 'dsn', 			$name_connection, 		'', '=' ,'');
 						$ini->set($section, 'pooling', 		'no', 					'', '=' ,'');
 						$ini->set($section, 'limit', 		'2', 					'', '=' ,'');
 						$ini->set($section, 'pre-connect', 	'yes', 					'', '=' ,'');
@@ -73,6 +79,33 @@ function pt1c_get_config($engine){
 					}
 					
 				}
+				
+				$file_odbc_ini = '/etc/odbc.ini';
+				if(is_file($file_odbc_ini) && exist_perms_file('/etc/odbc.ini')){
+					/*
+					; настройка соединения
+					[pt1c-MySQL-asteriskcdrdb]
+					Driver          = MySQL
+					Description     = MySQL connection to 'asteriskcdrdb' database
+					Server          = localhost
+					Port          	= 3306
+					Database     	= asteriskcdrdb
+					Option          = 3
+					*/
+					$ini = new pt1c_ini_parser();
+					$ini->read($file_odbc_ini);
+					if(!$ini->sections_exist('MySQL-asteriskcdrdb')){
+						$section = 'pt1c-MySQL-asteriskcdrdb';
+						$ini->set($section, 'Driver', 		'MySQL', 					'', '=' ,'');
+						$ini->set($section, 'Description', 	'MySQL to asteriskcdrdb', 	'', '=' ,'');
+						$ini->set($section, 'Server', 		'localhost', 				'', '=' ,'');
+						$ini->set($section, 'Port', 		'3306', 					'', '=' ,'');
+						$ini->set($section, 'Database', 	'asteriskcdrdb', 			'', '=' ,'');
+						$ini->set($section, 'Option', 		'3', 						'', '=' ,'');
+						$ini->write($file_odbc_ini);
+					}
+				}
+				
 			} // odbc settings
 
 	    	if (isset($ext) && is_a($ext, "extensions")) {
@@ -192,32 +225,17 @@ function pt1c_get_config($engine){
 }
 
 
+// This returns the version of a module
+function pt1c_modules_getversion($modname) {
+	global $db;
 
-//
-// копируем все файлы из указанного каталога в каталог назначения    
-function copyConfFile($srcDirNmae, $dstDirName){
-    if(!is_dir($srcDirNmae) && !is_dir( $dstDirName)){
-            return 0;
-    }
-    
-    $arrFileDir = scandir($srcDirNmae);
-    foreach($arrFileDir as $path)
-    {
-        if(!is_file($srcDirNmae."/".$path)){
-            continue;
-        }
-        
-        if (copy($srcDirNmae."/".$path , $dstDirName."/".$path)) { 
-            //
-            out(_("Copy file ".$path));
-            
-        }else{ 
-            //
-            out(_("Error copy ".$path)); 
-        }  
-    }
-    return 1;
-} 
+	$sql = "SELECT `version` FROM `asterisk`.`modules` WHERE `modulename` = '".$db->escapeSimple($modname)."'";
+	$results = $db->getRow($sql,DB_FETCHMODE_ASSOC);
+	if (isset($results['version'])) 
+		return $results['version'];
+	else
+		return '';
+}
 
 //
 //
@@ -251,8 +269,6 @@ function get_miko_settings(){
     
     return $arr_setting;
 }
-
-
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------
 // Проверка корректности введенных данных
@@ -308,5 +324,34 @@ function edit_miko_ajam_setting($section, $user_key, $user_value){
     global $amp_conf;
     $filename = $amp_conf['ASTETCDIR'].'/miko_ajam_setting.conf'; 
 	edit_ini_file($filename, $section, $user_key, $user_value);
+}
+
+
+// функция проверяет, есть ли права на запись в указанынй файл
+//
+function exist_perms_file($filename){
+	if(!is_file($filename)){
+		return false;
+	}
+	
+	$owner_is_aster = false;
+	$user_info = posix_getpwuid(fileowner($filename));	
+	if(is_array($user_info)){
+		$owner = $user_info['name'];
+		$owner_is_aster = ($owner == 'asterisk');
+	}
+	
+	$perms = fileperms($filename);
+	$ow=($perms & 0x0080);
+	$gw=($perms & 0x0010);
+	$ww=($perms & 0x0002);
+	
+	if($ow && $gw && $ww){
+		return true;
+	}elseif($ow && $owner_is_aster){
+		return true;
+	}else{
+		return false;
+	}
 }
 ?>
