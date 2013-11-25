@@ -24,10 +24,7 @@ function pt1c_get_config($engine){
     	case "asterisk":
 
 	    	if (isset($core_conf) && is_a($core_conf, "core_conf")) {
-				$ini = new pt1c_ini_parser();
-				$ini->read('/etc/odbc.ini');
-				$name_connection = ($ini->sections_exist('MySQL-asteriskcdrdb'))?'MySQL-asteriskcdrdb':'pt1c-MySQL-asteriskcdrdb';
-
+				$name_connection = 'MySQL-asteriskcdrdb';
 				$ver_core = pt1c_modules_getversion('core');
 				if(version_compare($ver_core, '2.8.1.2', '>') && method_exists($core_conf, "addResOdbc")){
 					$section = 'PT1C_asteriskcdrdb';
@@ -79,7 +76,13 @@ function pt1c_get_config($engine){
 					}
 					
 				}
-				
+				// правка pbxinaflash 
+				// рекурсивное включение файла
+				$link = '/etc/asterisk/res_odbc_custom.conf';
+				if(is_link($link)){
+					$name_file_link = basename(readlink($link));
+					if($name_file_link == 'res_odbc.conf') unlink($link);
+				}							
 				$file_odbc_ini = '/etc/odbc.ini';
 				if(is_file($file_odbc_ini) && exist_perms_file('/etc/odbc.ini')){
 					/*
@@ -95,7 +98,7 @@ function pt1c_get_config($engine){
 					$ini = new pt1c_ini_parser();
 					$ini->read($file_odbc_ini);
 					if(!$ini->sections_exist('MySQL-asteriskcdrdb')){
-						$section = 'pt1c-MySQL-asteriskcdrdb';
+						$section = 'MySQL-asteriskcdrdb';
 						$ini->set($section, 'Driver', 		'MySQL', 					'', '=' ,'');
 						$ini->set($section, 'Description', 	'MySQL to asteriskcdrdb', 	'', '=' ,'');
 						$ini->set($section, 'Server', 		'localhost', 				'', '=' ,'');
