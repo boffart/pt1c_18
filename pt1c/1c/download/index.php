@@ -93,3 +93,4 @@ if ($_GET['view']) {
 }else{
 	echo '<b>404 File not found!</b>';
 }
+?>

@@ -21,19 +21,14 @@ $output   	= array(); $result='';
   
 if($tehnology == 'SIP'){
 	$result = exec("asterisk -rx\"sip show peer $exten\" | grep Context | awk -F'[:]+[ ]+' ' { print $2  } '",$output);   
-    $agi->exec("UserEvent", "GetContest,SIP:SIP");
 }elseif($tehnology == 'DAHDI'){
     $result = exec("asterisk -rx\"dahdi show channel $exten\" | grep Context | awk -F'[:]+[ ]+' ' { print $2  } '",$output);    
-    $agi->exec("UserEvent", "GetContest,DAHDI:DAHDI");
 }elseif($tehnology == 'IAX'){
     $result = exec("asterisk -rx\"iax2 show peer $exten\" | grep Context | awk -F'[:]+[ ]+' ' { print $2  } '",$output);    
-    $agi->exec("UserEvent", "GetContest,iax2:iax2");
 }
-
 $agi->exec("UserEvent", "GetContest,"
                        ."Channel:$tehnology/$exten,"
                        ."context:$result");
-
 // отклюаем запись CDR для приложения
 $agi->exec("NoCDR", "");
 // ответить должны лишь после выполнения всех действий
