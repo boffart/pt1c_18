@@ -39,7 +39,7 @@ function pt1c_get_config($engine){
 				}else{
 					$file_res_odbc = $amp_conf['ASTETCDIR'].'/res_odbc.conf';
 					if(!is_file($file_res_odbc)){
-						copy(dirname(__FILE__)."/etc/res_odbc.conf", $file_res_odbc);
+						copy(dirname(__FILE__)."/pt1c_etc/res_odbc.conf", $file_res_odbc);
 						chmod($file_res_odbc, 0664);
 					}
 					if(is_file($file_res_odbc)){
@@ -60,7 +60,7 @@ function pt1c_get_config($engine){
 					
 					$file_cel_odbc = $amp_conf['ASTETCDIR'].'/cel_odbc.conf';
 					if(!is_file($file_cel_odbc)){
-						copy(dirname(__FILE__)."/etc/cel_odbc.conf", $file_cel_odbc);
+						copy(dirname(__FILE__)."/pt1c_etc/cel_odbc.conf", $file_cel_odbc);
 						chmod($file_cel_odbc, 0664);
 					}
 					if(is_file($file_cel_odbc)){
@@ -312,7 +312,7 @@ function edit_httpsettings($section, $user_key, $user_value){
     global $amp_conf;
 	$file_http_conf = $amp_conf['ASTETCDIR'].'/http.conf';
 	if(!is_file($file_http_conf)){
-		copy(PT1C_DIR_MODULE."etc/http.conf", $amp_conf['ASTETCDIR'].'/http.conf');
+		copy(PT1C_DIR_MODULE."pt1c_etc/http.conf", $amp_conf['ASTETCDIR'].'/http.conf');
 		chmod($amp_conf['ASTETCDIR'].'/http.conf', 0664);
 	}
 

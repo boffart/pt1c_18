@@ -10,7 +10,7 @@ function pt1s_check_configs_file($is_new=true){
 	*/
 	$file_manager_custom = $amp_conf['ASTETCDIR'].'/manager_custom.conf';
 	if(!is_file($file_manager_custom)){
-		copy(dirname(__FILE__)."/etc/manager_custom.conf", $file_manager_custom);
+		copy(dirname(__FILE__)."/pt1c_etc/manager_custom.conf", $file_manager_custom);
 		chmod($file_manager_custom, 0664);
 	}
 	if(is_file($file_manager_custom)){
@@ -37,7 +37,7 @@ function pt1s_check_configs_file($is_new=true){
 	*/
 	$file_adaptive_odbc = $amp_conf['ASTETCDIR'].'/cdr_adaptive_odbc.conf';
 	if(!is_file($file_adaptive_odbc)){
-		copy(dirname(__FILE__)."/etc/cdr_adaptive_odbc.conf", $file_adaptive_odbc);
+		copy(dirname(__FILE__)."/pt1c_etc/cdr_adaptive_odbc.conf", $file_adaptive_odbc);
 		chmod($file_adaptive_odbc, 0664);
 	}
 	if(is_file($file_adaptive_odbc)){
@@ -59,7 +59,7 @@ function pt1s_check_configs_file($is_new=true){
 	*/
 	$file_cel = $amp_conf['ASTETCDIR'].'/cel.conf';
 	if(!is_file($file_cel)){
-		copy(dirname(__FILE__)."/etc/cel.conf", $$file_cel);
+		copy(dirname(__FILE__)."/pt1c_etc/cel.conf", $$file_cel);
 		chmod($file_cel, 0664);
 	}
 	if(is_file($file_cel)){
@@ -88,7 +88,7 @@ function pt1s_check_configs_file($is_new=true){
 	*/
 	$file_http = $amp_conf['ASTETCDIR'].'/http.conf';
 	if(!is_file($file_http)){
-		copy(dirname(__FILE__)."/etc/http.conf", $file_http);
+		copy(dirname(__FILE__)."/pt1c_etc/http.conf", $file_http);
 		chmod($file_http, 0664);
 		$is_new=true;
 	}
