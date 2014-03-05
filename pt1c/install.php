@@ -1,6 +1,7 @@
 <?php
 /*------------------------------------------------------------------------------------------------------------------------------------------*/
 // if (!defined('FREEPBX_IS_AUTH')) { die('No direct script access allowed'); }
+define("PT1C_DIR_MODULE", dirname(__FILE__).'/');
 
 require_once(dirname(__FILE__).'/bin/pt1c_global_var.php');
 require_once(dirname(__FILE__).'/bin/pt1s_check_configs_file.php');
@@ -152,4 +153,8 @@ try {
 }
 
 pt1s_check_configs_file();
+try {
+	exec("asterisk -rx'module reload cdr_adaptive_odbc.so'");
+} catch (Exception $e) {
+}
 ?>

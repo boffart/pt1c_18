@@ -10,6 +10,7 @@ if ($_POST['action']=="editAJAM"){
 	 
 	edit_httpsettings("general","prefix",$_POST[prefix]);
 	edit_httpsettings("general","enabled",$_POST[status]);
+	edit_httpsettings("general","enablestatic",$_POST[status]);
 	edit_httpsettings("general","tlsenable",$_POST[statustls]);
 	
 	edit_miko_ajam_setting('options', 'database_server', $_POST[database_server]);

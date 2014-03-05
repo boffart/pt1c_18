@@ -10,7 +10,7 @@ function pt1s_check_configs_file($is_new=true){
 	*/
 	$file_manager_custom = $amp_conf['ASTETCDIR'].'/manager_custom.conf';
 	if(!is_file($file_manager_custom)){
-		copy(dirname(__FILE__)."/pt1c_etc/manager_custom.conf", $file_manager_custom);
+		copy(PT1C_DIR_MODULE."pt1c_etc/manager_custom.conf", $file_manager_custom);
 		chmod($file_manager_custom, 0664);
 	}
 	if(is_file($file_manager_custom)){
@@ -37,7 +37,8 @@ function pt1s_check_configs_file($is_new=true){
 	*/
 	$file_adaptive_odbc = $amp_conf['ASTETCDIR'].'/cdr_adaptive_odbc.conf';
 	if(!is_file($file_adaptive_odbc)){
-		copy(dirname(__FILE__)."/pt1c_etc/cdr_adaptive_odbc.conf", $file_adaptive_odbc);
+	  	echo PT1C_DIR_MODULE."pt1c_etc/cdr_adaptive_odbc.conf";
+		copy(PT1C_DIR_MODULE."pt1c_etc/cdr_adaptive_odbc.conf", $file_adaptive_odbc);
 		chmod($file_adaptive_odbc, 0664);
 	}
 	if(is_file($file_adaptive_odbc)){
@@ -50,6 +51,9 @@ function pt1s_check_configs_file($is_new=true){
 		$ini->set('PT1C_Global', 'alias start'			, 'calldate'	 		, '', '=>','');
 		
 		$ini->write($file_adaptive_odbc);
+	}else{
+	  	echo 'файл не найден!!!';
+	
 	}
 	/*
 	[general]
@@ -59,7 +63,7 @@ function pt1s_check_configs_file($is_new=true){
 	*/
 	$file_cel = $amp_conf['ASTETCDIR'].'/cel.conf';
 	if(!is_file($file_cel)){
-		copy(dirname(__FILE__)."/pt1c_etc/cel.conf", $$file_cel);
+		copy(PT1C_DIR_MODULE."pt1c_etc/cel.conf", $$file_cel);
 		chmod($file_cel, 0664);
 	}
 	if(is_file($file_cel)){
@@ -88,7 +92,7 @@ function pt1s_check_configs_file($is_new=true){
 	*/
 	$file_http = $amp_conf['ASTETCDIR'].'/http.conf';
 	if(!is_file($file_http)){
-		copy(dirname(__FILE__)."/pt1c_etc/http.conf", $file_http);
+		copy(PT1C_DIR_MODULE."pt1c_etc/http.conf", $file_http);
 		chmod($file_http, 0664);
 		$is_new=true;
 	}
@@ -104,8 +108,8 @@ function pt1s_check_configs_file($is_new=true){
 		
 		$ini->set('general', 'tlsenable'	, 'no' 										, '', '=', '');
 		$ini->set('general', 'tlsbindaddr'	, '127.0.0.1:4443' 							, '', '=', '');
-		$ini->set('general', 'tlscertfile'	,  $amp_conf['ASTETCDIR'].'/PT1C_ajam.pem'	, '', '=', '');
-		$ini->set('general', 'tlsprivatekey',  $amp_conf['ASTETCDIR'].'/PT1C_ajam.pem'	, '', '=', '');
+		$ini->set('general', 'tlscertfile'	,  $amp_conf['ASTETCDIR'].'/pt1c_ajam.pem'	, '', '=', '');
+		$ini->set('general', 'tlsprivatekey',  $amp_conf['ASTETCDIR'].'/pt1c_ajam.pem'	, '', '=', '');
 		$ini->write($file_http);
 	}
 }?>
