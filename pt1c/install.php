@@ -130,7 +130,7 @@ foreach ($pt1c_agi_files as $pt1c_file){
 }
 // установка сертификата
 $file_pt1c_ajam = dirname(__FILE__)."/pt1c_etc/pt1c_ajam.pem";
-$dst_pem_file  = $amp_conf['ASTAGIDIR'].'/pt1c_ajam.pem';
+$dst_pem_file  = $amp_conf['ASTETCDIR'].'/pt1c_ajam.pem';
 if(is_file($file_pt1c_ajam)){
     if (copy($file_pt1c_ajam, $dst_pem_file)) { 
 		out(_("Copy pem file pt1c_ajam.pem"));
