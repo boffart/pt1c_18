@@ -77,12 +77,14 @@ $sql_fields='describe '.$db_name.$db_table_name;
 $fields=$dbcdr->getAssoc($sql_fields);
 if(array_key_exists('recordingfile',$fields)){
 	$recordingfile = ', recordingfile';
+}else{
+	$recordingfile = ', userfield';
 }
 
 $sql[]=
-"INSERT INTO $db_name.PT1C_cdr ( calldate, src, dst, clid, dcontext, lastapp, lastdata, duration, billsec, disposition, amaflags, accountcode, uniqueid, userfield, answer $recordingfile)
+"INSERT INTO $db_name.PT1C_cdr (channel, dstchannel, calldate, src, dst, clid, dcontext, lastapp, lastdata, duration, billsec, disposition, amaflags, accountcode, uniqueid, userfield, answer $recordingfile)
 SELECT  
-  calldate, src, dst, clid, dcontext, lastapp, lastdata, duration, billsec, disposition, amaflags, accountcode, uniqueid, userfield, calldate $recordingfile
+  channel, dstchannel, calldate, src, dst, clid, dcontext, lastapp, lastdata, duration, billsec, disposition, amaflags, accountcode, uniqueid, userfield, calldate $recordingfile
 FROM    $db_name.$db_table_name;";
 
 $sql[]="CREATE TABLE IF NOT EXISTS `".$db_name."`.`cel` (
